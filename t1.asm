@@ -1,7 +1,7 @@
 .data 
 print1: .asciiz "Programa de Raiz Quadrada - Newton-Raphson\n"
-print2: .asciiz "Desenvolvedores: Diego Fraga, Joao Victor Terra, Raul Costa\n"
-print3loop: .asciiz "Digite os parametros x e i para calcular sqrt_nr (x, i) ou -1 para abortar a execucao"
+print2: .asciiz "Desenvolvedores: Diego Fraga, Joao Victor Terra, Raul Costa, Manuel Soares\n"
+print3loop: .asciiz "Digite os parametros x e i para calcular sqrt_nr (x, i) ou -1 para abortar a execucao\n"
 
 print_p1: .asciiz "sqrt("
 print_p2: .asciiz  ","
@@ -13,44 +13,112 @@ print_newline: .asciiz "\n"
 
 main:
     li $v0, 4
-    la $a0, print1 # "Programa de Raiz Quadrada - Newton-Raphson\n"
+    la $a0, print1 # imprime "Programa de Raiz Quadrada - Newton-Raphson\n"
     syscall
 
     li $v0, 4
-    la $a0, print2 # "Desenvolvedores: Diego Fraga, Joao Victor Terra, Raul Costa\n"
+    la $a0, print2 # imprime "Desenvolvedores: Diego Fraga, Joao Victor Terra, Raul Costa, Manuel Soares\n"
     syscall
 
-loop: # terminar
+loop:
     li $v0, 4
-    la #a0, print3loop # mensagem do loop
+    la $a0, print3loop # imprime "Digite os parametros x e i para calcular sqrt_nr (x, i) ou -1 para abortar a execucao\n"
     syscall
 
     li $v0, 5
-    syscall // pega valor de x
+    syscall # le valor de x
     move $t0, $v0
 
+    bltz $t0, end # verifica se x = -1
 
     li $v0, 5
-    syscall // pega valor de i
-    move $t0, $v0
+    syscall # le valor de i
+    move $t1, $v0
+
+    bltz $t1, end # verifica se i = -1
+
+
+    move $a0, $t0 # parametro x da funcao
+    move $a1, $t1 # parametro i da funcao
+
+    jal sqrt_nr #chamada de funcao
+    
+    move $t2, $v0 # coloca resultado no $t2
+
+    #imprime sqrt(x, i) = resultado / sqrt($t0, $t1) = $t2
+
+    li $v0, 4
+    la $a0, print_p1
+    syscall
+
+    li $v0, 1
+    move $a0, $t0
+    syscall
+
+    li $v0, 4
+    la $a0, print_p2
+    syscall
+
+    li $v0, 1
+    move $a0, $t1
+    syscall
+
+    li $v0, 4
+    la $a0, print_p3
+    syscall
+
+    li $v0, 1
+    move $a0, $t2
+    syscall
+
+    li $v0, 4
+    la $a0, print_newline
+    syscall
+
+    j loop # volta para o inicio do loop
 
 end:
     li $v0, 10 # fim do programa
     syscall
 
 sqrt_nr: # funcao
-    beq $a1, $a0, return_um # verifica se i eh igual a zero
+    # part1 = $t3
+    # parcial = $t4
+    # recursivo = nao precisa
+    # x = $a0
+    # i = $a1
+    
+    addi $sp, $sp -20 # libera 5 espaços na stack
+    sw $ra, 16($sp) # guarda o retorno
+    sw $a0, 12($sp) # guarda x
+    sw $a1, 8($sp) # guarda i
+    sw $t3, 4($sp) # guarda part1
+    sw $t4, 0($sp) # guarda parcial
+    
+    beq $a1, $a0, retorno # verifica se i eh igual a zero
+    
+    addi, $a1, $a1, -1 #i = i - 1
+    jal sqrt_nr
+    move $t3, $v0
+    
+    div $a0, $t3  # x / part1
+    mflo $t4 # parcial = x / part1
 
-    div $a0, $a1  # x / part1
-    mflo $t4
+    add $t4, $t4, $t5 # part1 + parcial
 
-    add $t5, $a1, $t4
-
-    li $t6, 2
-    div $t5, $t6
+    li $t6, 2 
+    div $t4, $t6 # (part1 + parcial) / 2
     mflo $v0
+    
+    lw $t4, 0($sp)
+    lw $t3, 4($sp)
+    lw $a1, 8($sp)
+    lw $a0, 12($sp)
+    lw $ra, 16($sp)
+    addi $sp, $sp, 20
+    
     jr $ra
 
-return_um: # funcao auxiliar
+retorno: # funcao auxiliar
     li $v0, 1
     jr $ra
