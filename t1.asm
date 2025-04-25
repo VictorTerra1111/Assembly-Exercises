@@ -12,41 +12,38 @@ print_newline: .asciiz "\n"
 .globl main
 
 main:
-    li $v0, 4
     la $a0, print1 # imprime "Programa de Raiz Quadrada - Newton-Raphson\n"
+    li $v0, 4
     syscall
 
-    li $v0, 4
     la $a0, print2 # imprime "Desenvolvedores: Diego Fraga, Joao Victor Terra, Raul Costa, Manuel Soares\n"
+    li $v0, 4
     syscall
 
 loop:
-    li $v0, 4
     la $a0, print3loop # imprime "Digite os parametros x e i para calcular sqrt_nr (x, i) ou -1 para abortar a execucao\n"
+    li $v0, 4
     syscall
 
+# le valor de x
     li $v0, 5
-    syscall # le valor de x
+    syscall 
     move $t0, $v0
-
     bltz $t0, end # verifica se x = -1
 
+ # le valor de i
     li $v0, 5
-    syscall # le valor de i
+    syscall
     move $t1, $v0
-
     bltz $t1, end # verifica se i = -1
-
 
     move $a0, $t0 # parametro x da funcao
     move $a1, $t1 # parametro i da funcao
 
     jal sqrt_nr #chamada de funcao
-    
     move $t2, $v0 # coloca resultado no $t2
 
     #imprime sqrt(x, i) = resultado / sqrt($t0, $t1) = $t2
-
     li $v0, 4
     la $a0, print_p1
     syscall
@@ -95,16 +92,16 @@ sqrt_nr: # funcao
     sw $t3, 4($sp) # guarda part1
     sw $t4, 0($sp) # guarda parcial
     
-    beq $a1, $a0, retorno # verifica se i eh igual a zero
+    beqz $a1, retorno # se i == 0, retorna x
     
-    addi, $a1, $a1, -1 #i = i - 1
+    addi $a1, $a1, -1 #i = i - 1
     jal sqrt_nr
     move $t3, $v0
     
     div $a0, $t3  # x / part1
     mflo $t4 # parcial = x / part1
 
-    add $t4, $t4, $t5 # part1 + parcial
+    add $t4, $t4, $t3 # parcial + part1
 
     li $t6, 2 
     div $t4, $t6 # (part1 + parcial) / 2
