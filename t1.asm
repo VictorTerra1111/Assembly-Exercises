@@ -10,29 +10,34 @@
 .text
 .globl main
 
-main:
-    la $a0, print1 # imprime "Programa de Raiz Quadrada - Newton-Raphson\n"
+.macro PRINT (%label)
     li $v0, 4
+    la $a0, %label
     syscall
+.end_macro
 
-    la $a0, print2 # imprime "Desenvolvedores: Diego Fraga, Joao Victor Terra, Raul Costa, Manuel Soares\n"
-    li $v0, 4
-    syscall
-
-loop:
-    la $a0, print3loop # imprime "Digite os parametros x e i para calcular sqrt_nr (x, i) ou -1 para abortar a execucao\n"
-    li $v0, 4
-    syscall
-
-# le valor de x
+.macro READ 
     li $v0, 5
     syscall 
+.end_macro
+
+main:
+# imprime "Programa de Raiz Quadrada - Newton-Raphson\n"
+    PRINT print1
+# imprime "Desenvolvedores: Diego Fraga, Joao Victor Terra, Raul Costa, Manuel Soares\n"
+    PRINT print2
+
+loop:
+# imprime "Digite os parametros x e i para calcular sqrt_nr (x, i) ou -1 para abortar a execucao\n"
+    PRINT print3loop 
+
+# le valor de x
+    READ
     move $t0, $v0
     bltz $t0, end # verifica se x = -1
 
 # le valor de i
-    li $v0, 5
-    syscall
+    READ
     move $t1, $v0
     bltz $t1, end # verifica se i = -1
     
@@ -43,33 +48,25 @@ loop:
     move $t2, $v0 # coloca resultado no $t2
 
 #imprime sqrt(x, i) = resultado / sqrt($t0, $t1) = $t2
-    li $v0, 4
-    la $a0, print_p1
-    syscall
+    PRINT print_p1
 
     li $v0, 1
     move $a0, $t0
     syscall
 
-    li $v0, 4
-    la $a0, print_p2
-    syscall
+    PRINT print_p2
 
     li $v0, 1
     move $a0, $t1
     syscall
 
-    li $v0, 4
-    la $a0, print_p3
-    syscall
+    PRINT print_p3
 
     li $v0, 1
     move $a0, $t2
     syscall
 
-    li $v0, 4
-    la $a0, print_newline
-    syscall
+    PRINT print_newline
 
     j loop # volta para o inicio do loop
 
@@ -86,9 +83,9 @@ sqrt_nr: # funcao
     
     beqz $a1, retorno # se i == 0, retorna x
     
-    addi $a1, $a1, -1 #i = i - 1
+    addi $a1, $a1, -1 # i = i - 1
     
-    addi $sp, $sp -20 # libera 5 espaços na stack
+    addi $sp, $sp -20 # libera 5 espaÃ§os na stack
     sw $ra, 16($sp) # guarda o retorno
     sw $a0, 12($sp) # guarda x
     sw $a1, 8($sp) # guarda i
