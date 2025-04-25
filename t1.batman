@@ -1,1 +1,29 @@
-pseudo 
+função 'sqrt_nr' recebe var x, var i, retorna um valor inteiro
+inicio:
+    se i igual a 0 retorna 1 
+    variável (inteiro) part1 = sqer_nr lê x, i-1
+    variável (inteiro) parcial = x dividido por part1
+    variável (inteiro) recursivo = (part1 mais parcial) dividido por 2
+    retorna recursivo
+fim da função
+
+função principal:
+    imprime "Programa de Raiz Quadrada - Newton-Raphson"
+    imprime "Desenvolvedores: Diego Fraga, Joao Victor Terra, Raul Costa, Manuel Soares da Luz"
+    variável (inteiro) x
+    variável (inteiro) i
+    enquanto x maior ou igual a 0
+    início enquanto: 
+        imprime "Digite os parametros x e i para calcular sqrt_nr (x, i) ou -1 para abortar a execucao"
+        lê valor de x
+        se x menor que 0 
+            fim enquanto: 
+        lê valor de i
+        se i menor que 0
+            fim enquanto: 
+
+        variável (inteiro) answer = função sqrt_nr com parametros x e i
+
+        imprime sqrt( valor de x e i) = answer
+    fim enquanto
+fim função principal
